@@ -1,40 +1,63 @@
 import React, {useEffect, useState} from 'react';
-import { View, StyleSheet, Text, FlatList } from 'react-native';
+import {View, Text, Button, FlatList, StyleSheet} from 'react-native';
 
-import EntryListItem from './EntryListItem/index'
+import EntryListItem from './EntryListItem';
 
-import {getEntries} from '../../services/Entries'
+import {getEntries} from '../../services/Entries';
 
-export default function EntryList() {
-
-  [entries, setEntries] = useState([])
+const EntryList = ({navigation}) => {
+  const [entries, setEntries] = useState([]);
 
   useEffect(() => {
-
-    async function loadEntries(){
+    async function loadEntries() {
       const data = await getEntries();
-      setEntries(data)
+      setEntries(data);
     }
+
     loadEntries();
 
-    console.log('EntryList :: useEffect')
-  }, [])
+    console.log('EntryList :: useEffect');
+  }, []);
 
+  const ok = () =>{
+    console.log("deu certo")
+  }
 
- return (
-   <View>
-     <Text style={{fontSize: 22,
-    fontWeight: 'bold',marginBottom: 10,marginTop: 10}}>Ultimos Lançamentos</Text>
-
-    <FlatList 
+  return (
+    <View>
+      <Text style={styles.title}>Últimos Lançamentos</Text>
+      <FlatList
         data={entries}
-      renderItem={ ({item}) => <Text>{item.description} - ${item.amount} </Text> }>
-    </FlatList>
-   </View>
+        renderItem={({item}) => (
+          <View>
+            <Text style={styles.entry}>
+              - {item.description} - ${item.amount}
+            </Text>
+            <Button
+            title="teste"
+            onPress={() => navigation.navigate('NewEntry')}/>
+            <Button
+            title={item.id}
+            onPress={() => {
+              navigation.navigate('NewEntry', {entry: item});
+            }}/>
+          </View>
+        )}
+      />
+    </View>
   );
-}
-const styles = StyleSheet.create({
-    container:{
+};
 
-    }
-})
+const styles = StyleSheet.create({
+  container: {
+    // flex: 1,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+});
+
+export default EntryList;

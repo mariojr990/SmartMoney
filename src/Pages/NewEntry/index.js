@@ -1,53 +1,62 @@
 import React, {useState} from 'react';
-import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
+import {View, TextInput, Button, StyleSheet} from 'react-native';
 
-import BalanceLabel from '../../components/BalanceLabel/index'
+import BalanceLabel from '../../components/BalanceLabel';
+
 import {saveEntry} from '../../services/Entries';
 
-export default function NewEntry({navigation}) {
+const NewEntry = ({navigation}) => {
+  const currentBalance = 2065.35;
 
-    const currentBalance= 2065.34
-    const [amount, setAmount] = useState('0');
+  const entry = navigation.getParam('entry', {
+    id: null,
+    amount: '0.00',
+    entryAt: new Date(),
+  });
 
-     const save = () =>{
+  const [amount, setAmount] = useState(`${entry.amount}`);
 
-        const value = {
-            amount: parseFloat(amount)
-        }
+  const save = () => {
+    const data = {
+      amount: parseFloat(amount),
+    };
 
-         console.log("NewEntry :: save", value)
-         saveEntry(value)
-     }
-    
- return (
-   <View style={styles.container}>
-       <BalanceLabel currentBalance={currentBalance}/>
-       <View>
-       <TextInput style={styles.input}
-       onChangeText={ text => setAmount(text)}
-       value={amount}
-       />
-       <TextInput style={styles.input}/>
-       <Button title="Camera"/>
-       <Button title="GPS"/>
-       </View>
+    console.log('NewEntry :: save ', data);
+    saveEntry(data, entry);
+  };
 
-       <View>
-           <Button title="Adicionar" onPress={save} />
-           <Button title="Cancelar" onPress={() => navigation.goBack()}/> 
-       </View>
-   </View>
+  return (
+    <View style={styles.container}>
+      <BalanceLabel currentBalance={currentBalance} />
+
+      <View>
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setAmount(text)}
+          value={amount}
+        />
+        <TextInput style={styles.input} />
+        <Button title="GPS" />
+        <Button title="Camera" />
+      </View>
+
+      <View>
+        <Button title="Adicionar" onPress={save} />
+        <Button title="Cancelar" onPress={() => navigation.goBack()} />
+      </View>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-    container:{
-        //flex: 1,
-        padding: 10
-    },
-    input: {
-        borderColor: '#000',
-        borderWidth: 1,
-        
-    }
-})
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  input: {
+    borderColor: '#000',
+    borderWidth: 1,
+  },
+});
+
+export default NewEntry;

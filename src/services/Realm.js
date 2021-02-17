@@ -1,12 +1,11 @@
 import Realm from 'realm';
-
-import EntrySchema from '../schemas/EntrySchema'
-import CategorySchema from '../schemas/CotegorySchema'
+import CategorySchema from '../schemas/CotegorySchema/'
+import EntrySchema from '../schemas/EntrySchema';
 
 export const getRealm = async () => {
   const realm = await Realm.open({
     schema: [CategorySchema, EntrySchema],
-    schemaVersion: 2,
+    schemaVersion: 3,
   });
 
   return realm;

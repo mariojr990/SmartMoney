@@ -1,15 +1,14 @@
 import React from 'react';
-import { StyleSheet, View,  Text, FlatList} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 
-export default function EntryListItem() {
- return (
-   <View style={styles.container}>
-       
-   </View>
+const EntryListItem = () => {
+  return (
+    <View>
+      <Text>EntryListItem</Text>
+    </View>
   );
-}
-const styles =StyleSheet.create({
-    container:{
-    },
+};
 
-})
+const styles = StyleSheet.create({});
+
+export default EntryListItem;
