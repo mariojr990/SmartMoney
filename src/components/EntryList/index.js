@@ -19,10 +19,6 @@ const EntryList = ({navigation}) => {
     console.log('EntryList :: useEffect');
   }, []);
 
-  const ok = () =>{
-    console.log("deu certo")
-  }
-
   return (
     <View>
       <Text style={styles.title}>Últimos Lançamentos</Text>
@@ -34,13 +30,11 @@ const EntryList = ({navigation}) => {
               - {item.description} - ${item.amount}
             </Text>
             <Button
-            title="teste"
-            onPress={() => navigation.navigate('NewEntry')}/>
-            <Button
-            title={item.id}
-            onPress={() => {
-              navigation.navigate('NewEntry', {entry: item});
-            }}/>
+              title={item.id}
+              onPress={() => {
+                navigation.navigate('NewEntry', {entry: item});
+              }}
+            />
           </View>
         )}
       />
