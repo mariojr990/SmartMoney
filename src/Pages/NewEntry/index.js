@@ -1,75 +1,96 @@
 import React, {useState} from 'react';
-import {View, TextInput, Button, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 
 import BalanceLabel from '../../components/BalanceLabel';
+import NewEntryInput from './NewEntryInput';
+import NewEntryCategoryPicker from './NewEntryCategoryPicker';
+import NewEntryDatePicker from './NewEntryDatePicker/index'
+import NewEntryDeleteAction from './NewEntryDeleteAction/index'
+import ActionFooter, {ActionPrimaryButton, ActionSecondaryButton} from '../../components/Core/ActionFooter/index'
 
-import {saveEntry} from '../../services/Entries';
+import useEntries from '../../hooks/useEntries'
 
-import {deleteEntry} from '../../services/Entries'
+
+
+import Colors from '../../styles/Colors';
 
 const NewEntry = ({navigation}) => {
-  const currentBalance = 2065.35;
-
   const entry = navigation.getParam('entry', {
     id: null,
-    amount: '0.00',
+    amount: 0,
     entryAt: new Date(),
+    category: {id: null, name: 'Selecione'},
   });
 
-  const [amount, setAmount] = useState(`${entry.amount}`);
+  const [, saveEntry, deleteEntry] = useEntries()
 
-  const isValid = () =>{
+  const [debit, setDebit] = useState(entry.amount <= 0);
+  const [amount, setAmount] = useState(entry.amount);
+  const [category, setCategory] = useState(entry.category);
+  const [entryAt, setEntryAt] = useState(entry.entryAt)
+
+  const isValid = () => {
     if (parseFloat(amount) !== 0) {
-      return true
-    } else {
-      return false
+      return true;
     }
-    
-  }
+
+    return false;
+  };
 
   const onSave = () => {
     const data = {
       amount: parseFloat(amount),
+      category: category,
+      entryAt: entryAt,
     };
 
     console.log('NewEntry :: save ', data);
     saveEntry(data, entry);
-    alert('Salvo com sucesso')
-    onClose()
+    onClose();
   };
 
-  const onDelete = () =>{
-    deleteEntry(entry)
-    onClose()
-  }
+  const onDelete = () => {
+    deleteEntry(entry);
+    onClose();
+  };
 
-  const onClose = () =>{
-    navigation.goBack()
-  }
+  const onClose = () => {
+    navigation.goBack();
+  };
 
   return (
     <View style={styles.container}>
-      <BalanceLabel currentBalance={currentBalance} />
+      <BalanceLabel />
 
-      <View>
-        <TextInput
-          style={styles.input}
-          onChangeText={text => setAmount(text)}
+      <View style={styles.formContainer}>
+        <NewEntryInput 
           value={amount}
-          keyboardType="number-pad"
+          onChangeValue={setAmount}
+          onChangeDebit={setDebit}
         />
-        <TextInput style={styles.input} />
-        <Button title="GPS" />
-        <Button title="Camera" />
+
+        <NewEntryCategoryPicker
+          debit={debit}
+          category={category}
+          onChangeCategory={setCategory}
+        />
+
+        <View style={styles.formActionContainer}>
+          <NewEntryDatePicker value={entryAt} onChange={setEntryAt}/>
+          <NewEntryDeleteAction entry={entry} onOkPress={onDelete}/>
+        </View>
+
+      
+
+        <ActionFooter>
+          <ActionPrimaryButton title={entry.id ? 'Salvar' : 'Adicionar'} onPress={() => {
+              isValid() && onSave();
+            }}/>
+          <ActionSecondaryButton title="Cancelar" onPress={onClose}/>
+        </ActionFooter>
       </View>
 
-      <View>
-        <Button title="Adicionar" onPress={ () =>{
-          isValid() && onSave()
-        }} />
-        <Button title="Excluir"onPress={onDelete}/>
-        <Button title="Cancelar" onPress={onClose} />
-      </View>
+      
     </View>
   );
 };
@@ -77,12 +98,19 @@ const NewEntry = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
     padding: 10,
   },
-  input: {
-    borderColor: '#000',
-    borderWidth: 1,
+  formActionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+
   },
+  formContainer: {
+    flex: 1,
+    paddingVertical: 20
+  }
 });
 
 export default NewEntry;

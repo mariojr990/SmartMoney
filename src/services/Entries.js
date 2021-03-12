@@ -1,11 +1,30 @@
 import {Alert} from 'react-native';
 
+import moment from '../vendors/moment';
+
 import {getRealm} from './Realm';
 import {getUUID} from '../services/UUID';
 
-export const getEntries = async () => {
-  const realm = await getRealm();
-  const entries = realm.objects('Entry');
+export const getEntries = async (days, category) => {
+  let realm = await getRealm();
+
+  realm = realm.objects('Entry');
+
+  if (days > 0) {
+    const date = moment()
+      .subtract(days, 'days')
+      .toDate();
+
+    console.log('getEntries :: days ', days);
+
+    realm = realm.filtered('entryAt >= $0', date);
+  }
+  
+  if(category && category.id){
+    realm = realm.filtered('category == $0', category);
+  }
+
+  const entries = realm.sorted('entryAt', true);
 
   console.log('getEntries :: entries ', JSON.stringify(entries));
 
@@ -22,7 +41,9 @@ export const saveEntry = async (value, entry = {}) => {
         id: value.id || entry.id || getUUID(),
         amount: value.amount || entry.amount,
         entryAt: value.entryAt || entry.entryAt,
+        description: value.category.name,
         isInit: false,
+        category: value.category || entry.category,
       };
 
       realm.create('Entry', data, true);
@@ -37,17 +58,18 @@ export const saveEntry = async (value, entry = {}) => {
   return data;
 };
 
-
 export const deleteEntry = async entry => {
   const realm = await getRealm();
 
   try {
     realm.write(() => {
-      realm.delete(entry)
-    })
+      realm.delete(entry);
+    });
   } catch (error) {
-    console.error('saveEntry :: error on delete object: ', JSON.stringify(entry));
-    Alert.alert('Erro ao deletar os dados de lançamento.');
+    console.error(
+      'deleteEntry :: error on delete object: ',
+      JSON.stringify(entry),
+    );
+    Alert.alert('Erro ao excluir este lançamento.');
   }
-
-}
+};
